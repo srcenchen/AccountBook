@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,20 +19,24 @@ import kiwi.orbit.compose.ui.controls.Icon
 import kiwi.orbit.compose.ui.controls.IconButton
 import kiwi.orbit.compose.ui.controls.Text
 
+/**
+ * 密码展示组件
+ * @author sanenchen
+ */
 @Composable
 fun PasswordBookComponent(options: Int) {
-    val queryResult = if(options == -1) AppDatabase.database.PasswordDataDao().queryAll().collectAsState(listOf()).value
-            else AppDatabase.database.PasswordDataDao().queryWithGroup(options).collectAsState(listOf()).value
+    val queryResult = if (options == -1) AppDatabase.database.PasswordDataDao().queryAll().collectAsState(listOf()).value
+    else AppDatabase.database.PasswordDataDao().queryWithGroup(options).collectAsState(listOf()).value
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(items = queryResult) {
-            PasswordItem(title = it.title, user = it.user, password = it.password)
+            PasswordItem(title = it.title, user = it.user, password = it.password, id = it.id)
         }
     }
 }
 
 @Composable
-fun PasswordItem(title: String, user: String, password: String) {
+fun PasswordItem(title: String, user: String, password: String, id: Long) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         var isShowingUser by remember { mutableStateOf(true) }
         Box(
@@ -49,10 +54,29 @@ fun PasswordItem(title: String, user: String, password: String) {
                 }
             }
         }
-        IconButton(onClick = { /*TODO*/ }, modifier = Modifier
-            .padding(end = 16.dp)
-            .size(48.dp)) {
-            Icon(imageVector = Icons.Outlined.Info, contentDescription = null, tint = OrbitTheme.colors.primary.normal, modifier = Modifier.size(24.dp))
+        IconButton(
+            onClick = { /*TODO*/ }, modifier = Modifier.size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = null,
+                tint = OrbitTheme.colors.primary.normal,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        IconButton(
+            onClick = {
+                AppDatabase.database.PasswordDataDao().dropData(id = id)
+            }, modifier = Modifier
+                .padding(end = 16.dp)
+                .size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Delete,
+                contentDescription = null,
+                tint = OrbitTheme.colors.critical.normal,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }

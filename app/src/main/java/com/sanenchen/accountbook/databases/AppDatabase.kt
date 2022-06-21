@@ -1,14 +1,6 @@
 package com.sanenchen.accountbook.databases
 
-import androidx.room.ColumnInfo
-import androidx.room.Dao
-import androidx.room.Database
-import androidx.room.Entity
-import androidx.room.Insert
-import androidx.room.PrimaryKey
-import androidx.room.Query
-import androidx.room.RoomDatabase
-import androidx.room.Update
+import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -58,7 +50,13 @@ interface PasswordGroupDao {
     fun insertPasswordGroup(passwordGroup: PasswordGroup): Long
 
     @Query("select * from PasswordGroup")
-    fun queryAll(): List<PasswordGroup>
+    fun queryAll(): Flow<List<PasswordGroup>>
+
+    @Query("delete from PasswordGroup where id=:id")
+    fun dropGroup(id: Int)
+
+    @Update()
+    fun update(passwordData: PasswordGroup)
 }
 
 /**
@@ -85,6 +83,18 @@ interface PasswordDataDao{
 
     @Query("select * from PasswordData where groupID=:id")
     fun queryWithGroup(id: Int): Flow<List<PasswordData>>
+
+    @Query("select * from PasswordData where groupID=:id")
+    fun queryWithGroupCommon(id: Int): List<PasswordData>
+
+    @Update()
+    fun update(passwordData: PasswordData)
+
+    @Update()
+    fun updateList(passwordData: List<PasswordData>)
+
+    @Query("delete from PasswordData where id=:id")
+    fun dropData(id: Long)
 }
 
 @Database(version = 2, entities = [SettingInformation::class, PasswordGroup::class, PasswordData::class])

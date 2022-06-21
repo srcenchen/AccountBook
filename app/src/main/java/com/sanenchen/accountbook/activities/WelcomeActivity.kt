@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,8 +42,9 @@ class WelcomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // 判断是否已经注册过了
         // 首先，将数据库初始化好，接下来的数据库都会是这一个，只初始化一次本数据库
-        AppDatabase.database = Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").allowMainThreadQueries().build()
-        if(AppDatabase.database.SettingInformationDao().queryAll().isNotEmpty()){
+        AppDatabase.database =
+            Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").allowMainThreadQueries().build()
+        if (AppDatabase.database.SettingInformationDao().queryAll().isNotEmpty()) {
             // 跳转
             startActivity(Intent(this@WelcomeActivity, VerifyActivity::class.java))
             this@WelcomeActivity.finish()
@@ -58,16 +60,18 @@ class WelcomeActivity : ComponentActivity() {
                         // 设置密码
                         var passwordFirst by remember { mutableStateOf("") }
                         var passwordFinal by remember { mutableStateOf("") }
-                        var isFirstError by remember { mutableStateOf(false) }
-                        var isSecondError by remember { mutableStateOf(false) }
                         TextField(
                             value = passwordFirst,
                             onValueChange = { passwordFirst = it },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                            label = { Text("安全密码 至少6位") },
+                            label = { Text("安全密码") },
                             modifier = Modifier.fillMaxWidth(),
                             leadingIcon = { Icon(painter = Icons.Security, contentDescription = null) },
-                            visualTransformation = PasswordVisualTransformation()
+                            visualTransformation = PasswordVisualTransformation(),
+                            info = { Text("安全密码至少需要6位数字") },
+                            error = if (passwordFirst.length < 6 && passwordFirst.isNotEmpty()) {
+                                { Text("安全密码至少需要6位数字") }
+                            } else null
                         )
                         TextField(
                             value = passwordFinal,
@@ -78,10 +82,11 @@ class WelcomeActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .padding(top = 8.dp),
                             leadingIcon = { Icon(painter = Icons.Security, contentDescription = null) },
-                            visualTransformation = PasswordVisualTransformation()
+                            visualTransformation = PasswordVisualTransformation(),
+                            error = if (passwordFinal != passwordFirst && passwordFinal.isNotEmpty()) {
+                                { Text("两次密码不一致！") }
+                            } else null
                         )
-                        isFirstError = passwordFirst.length < 6
-                        isSecondError = passwordFinal != passwordFirst
                         // 关于指纹识别
                         var isUsedFingerPrint by remember { mutableStateOf(isFingerPrint()) }
                         Row(
@@ -108,9 +113,9 @@ class WelcomeActivity : ComponentActivity() {
                         ) {
                             var isShowingWarningDialog by remember { mutableStateOf(false) }
                             ButtonPrimary(onClick = {
-                                if (isFirstError || isSecondError) {
-                                    Toast.makeText(this@WelcomeActivity, "啊嘞，有什么东西填错了哎", Toast.LENGTH_SHORT).show()
-                                } else {
+                                if (passwordFinal == passwordFirst && passwordFinal.isNotEmpty() &&
+                                    passwordFirst.length >= 6 && passwordFirst.isNotEmpty()
+                                ) {
                                     // 插入相关数据
                                     val settingInformation = SettingInformation(
                                         0,
@@ -132,7 +137,6 @@ class WelcomeActivity : ComponentActivity() {
                                     // 导入 Sample 数据
                                     AppDatabase.database.PasswordDataDao().insertPasswordData(passwordData)
                                     AppDatabase.database.SettingInformationDao().insertSettingInfo(settingInformation)
-                                    Log.i("DataBase", AppDatabase.database.SettingInformationDao().queryAll()[0].password)
                                     isShowingWarningDialog = true
                                 }
                             }) {
@@ -142,7 +146,7 @@ class WelcomeActivity : ComponentActivity() {
                                 AlertDialog(title = { Text("警告", style = OrbitTheme.typography.title2) },
                                     text = { Text("请注意，本安全密码为确认您身份的最后凭证，请妥善保管", style = OrbitTheme.typography.bodyNormal) },
                                     confirmButton = {
-                                        Button(onClick = {
+                                        TextButton(onClick = {
                                             startActivity(Intent(this@WelcomeActivity, VerifyActivity::class.java))
                                             this@WelcomeActivity.finish()
                                         }, content = { Text("知道了") })

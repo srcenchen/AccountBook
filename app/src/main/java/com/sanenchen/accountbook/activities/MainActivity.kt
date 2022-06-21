@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.room.Room
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -28,9 +29,17 @@ import kiwi.orbit.compose.ui.OrbitTheme
 import kiwi.orbit.compose.ui.controls.*
 import kotlinx.coroutines.launch
 
+/**
+ * 主界面
+ * @author sanenchen
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 再次初始化数据库，防止长时间挂后台，导致闪退
+        // 在此之外切切不可初始化，否则将会导致数据监听失效
+        AppDatabase.database =
+            Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").allowMainThreadQueries().build()
         setContent {
             AccountBookTheme {
                 Scaffold(topBar = {
@@ -65,7 +74,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun RowIndex() {
         // 获取组别
-        val groupList = AppDatabase.database.PasswordGroupDao().queryAll()
+        val groupList = AppDatabase.database.PasswordGroupDao().queryAll().collectAsState(listOf()).value
 
         val state = rememberPagerState(0)
         val scope = rememberCoroutineScope()
@@ -96,7 +105,7 @@ class MainActivity : ComponentActivity() {
                 Modifier.fillMaxSize()
             ) {
                 if (tabIndex == 0)
-                    PasswordBookComponent( -1)
+                    PasswordBookComponent(-1)
                 else
                     PasswordBookComponent(groupList[tabIndex - 1].id)
             }
@@ -108,9 +117,10 @@ class MainActivity : ComponentActivity() {
      */
     @Composable
     fun AllowedScreenShot() {
-        if (!AppDatabase.database.SettingInformationDao().queryAll()[0].allowScreenShot)
-            window.addFlags(WindowManager.LayoutParams.FLAG_SECURE) // 禁止截图
-        else
-            window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) // 允许截图
+        for (item in AppDatabase.database.SettingInformationDao().queryAllFlow().collectAsState(initial = listOf()).value)
+            if (!item.allowScreenShot)
+                window.addFlags(WindowManager.LayoutParams.FLAG_SECURE) // 禁止截图
+            else
+                window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) // 允许截图
     }
 }

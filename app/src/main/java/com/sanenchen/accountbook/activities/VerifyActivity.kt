@@ -28,9 +28,9 @@ import com.sanenchen.accountbook.R
 import com.sanenchen.accountbook.databases.AppDatabase
 import com.sanenchen.accountbook.ui.theme.AccountBookTheme
 import kiwi.orbit.compose.ui.OrbitTheme
-import kiwi.orbit.compose.ui.controls.ButtonPrimarySubtle
 
 /**
+ * 身份验证
  * @author sanenchen
  */
 class VerifyActivity : FragmentActivity() {
