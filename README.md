@@ -2,10 +2,10 @@
 version 0.1
 账号本子，一款可以记录你的各种密码的软件  
 ### 截图
-![1.png](./ScreenShot/VerifyActivity.png)
+![1.png](./ScreenShot/VerifyActivity.png  =300x300)
 ![2.png](./ScreenShot/MainActivity.png)
 ![3.png](./ScreenShot/AddPassword.png)
-![4.png](./ScreenShot/VerifyActivity.png)
+![4.png](./ScreenShot/GroupManager.png)
 #### 开发中~~~
 ## To-DO List
 - [x] 新建密码  
