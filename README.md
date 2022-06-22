@@ -1,5 +1,5 @@
 # AccountBook
-version 0.1
+version 0.1  
 账号本子，一款可以记录你的各种密码的软件  
 ### 截图
 ![1.png](./ScreenShot/VerifyActivity.png)
@@ -13,12 +13,19 @@ version 0.1
 - [x] 生物验证  
 - [x] 安全密码修改
 - [ ] 随机密码  
-- [ ] 密码详情页  
+- [x] 密码详情页  
 - [ ] 搜索功能  
 - [ ] 密码修改
 
-## Version Update
-### Version 0.1
+## Version Update  
+### version 0.1.1
+发布日期 2022.6.22  
+第一个测试版本正式发布  
+完成的工作：  
+- 密码详情页  
+- UI 微改动  
+基础功能已经完成，增删查已经完善，改尚未开发
+### version 0.1
 发布日期：2022.6.21  
 已完成的工作：  
 - 新建密码  

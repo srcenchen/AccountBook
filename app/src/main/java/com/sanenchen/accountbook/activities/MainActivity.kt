@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
             AccountBookTheme {
                 Scaffold(topBar = {
                     TopAppBar(
-                        title = { Text("账号本子") }, elevation = 0.dp, actions = {
+                        title = { Text("简·密码本") }, elevation = 0.dp, actions = {
                             IconButton(onClick = { startActivity(Intent(this@MainActivity, AddPasswordActivity::class.java)) }) { // 添加按钮
                                 Icon(imageVector = Icons.Filled.Add, contentDescription = "新建")
                             }
@@ -105,9 +105,9 @@ class MainActivity : ComponentActivity() {
                 Modifier.fillMaxSize()
             ) {
                 if (tabIndex == 0)
-                    PasswordBookComponent(-1)
+                    PasswordBookComponent(-1, this@MainActivity)
                 else
-                    PasswordBookComponent(groupList[tabIndex - 1].id)
+                    PasswordBookComponent(groupList[tabIndex - 1].id, this@MainActivity)
             }
         }
     }

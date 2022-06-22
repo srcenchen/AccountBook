@@ -55,7 +55,10 @@ interface PasswordGroupDao {
     @Query("delete from PasswordGroup where id=:id")
     fun dropGroup(id: Int)
 
-    @Update()
+    @Query("select * from PasswordGroup where id=:id")
+    fun queryWithID(id: Int): List<PasswordGroup>
+
+    @Update
     fun update(passwordData: PasswordGroup)
 }
 
@@ -64,7 +67,7 @@ interface PasswordGroupDao {
  */
 @Entity
 data class PasswordData(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo var title: String,
     @ColumnInfo var user: String,
     @ColumnInfo var password: String,
@@ -87,14 +90,17 @@ interface PasswordDataDao{
     @Query("select * from PasswordData where groupID=:id")
     fun queryWithGroupCommon(id: Int): List<PasswordData>
 
-    @Update()
+    @Query("select * from PasswordData where id=:id")
+    fun queryWithID(id: Int): List<PasswordData>
+
+    @Update
     fun update(passwordData: PasswordData)
 
-    @Update()
+    @Update
     fun updateList(passwordData: List<PasswordData>)
 
     @Query("delete from PasswordData where id=:id")
-    fun dropData(id: Long)
+    fun dropData(id: Int)
 }
 
 @Database(version = 2, entities = [SettingInformation::class, PasswordGroup::class, PasswordData::class])

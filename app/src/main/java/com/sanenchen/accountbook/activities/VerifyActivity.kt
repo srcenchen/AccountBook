@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.room.Room
 import com.sanenchen.accountbook.R
 import com.sanenchen.accountbook.databases.AppDatabase
 import com.sanenchen.accountbook.ui.theme.AccountBookTheme
@@ -37,6 +38,10 @@ class VerifyActivity : FragmentActivity() {
     var autoVerify = true // 是否自动弹出验证框
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 再次初始化数据库，防止长时间挂后台，导致闪退
+        // 在此之外切切不可初始化，否则将会导致数据监听失效
+        AppDatabase.database =
+                Room.databaseBuilder(applicationContext, AppDatabase::class.java, "database").allowMainThreadQueries().build()
         setContent {
             AccountBookTheme {
                 // 开发测试专用
@@ -52,9 +57,16 @@ class VerifyActivity : FragmentActivity() {
     fun MainUI() {
         var password by remember { mutableStateOf("") }
         val isUsingBiometric = AppDatabase.database.SettingInformationDao().queryAll()[0].isUsingBiometric
+        val rightPassword = AppDatabase.database.SettingInformationDao().queryAll()[0].password // 获取密码
         if (isUsingBiometric && autoVerify) {
             autoVerify = false
             verifyBiometric() // 自动弹出验证框
+        }
+        // 实时验证密码
+        if (password == rightPassword) {
+            // 跳转
+            startActivity(Intent(this@VerifyActivity, MainActivity::class.java))
+            this@VerifyActivity.finish()
         }
 
         Column(
