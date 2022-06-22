@@ -93,6 +93,9 @@ interface PasswordDataDao{
     @Query("select * from PasswordData where id=:id")
     fun queryWithID(id: Int): List<PasswordData>
 
+    @Query("select * from PasswordData where id=:id")
+    fun queryWithIDFlow(id: Int): Flow<List<PasswordData>>
+
     @Update
     fun update(passwordData: PasswordData)
 

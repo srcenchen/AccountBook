@@ -143,7 +143,7 @@ class VerifyActivity : FragmentActivity() {
      */
     private fun verifyBiometric() {
         val biometricPromptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("需要鉴定").setDescription("鉴定以登入 AccountBook")
+            .setTitle("需要鉴定").setDescription("鉴定以登入 Password")
             .setNegativeButtonText("取消").build()
         val executor = ContextCompat.getMainExecutor(this)
         val biometric = BiometricPrompt(this@VerifyActivity, executor, object : BiometricPrompt.AuthenticationCallback() {

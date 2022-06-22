@@ -3,16 +3,13 @@ package com.sanenchen.accountbook.activities
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +22,11 @@ import kiwi.orbit.compose.ui.OrbitTheme
 import kiwi.orbit.compose.ui.controls.IconButton
 import kiwi.orbit.compose.ui.controls.Text
 import kiwi.orbit.compose.ui.controls.TopAppBar
-import kotlinx.coroutines.launch
 
+/**
+ * 分组管理
+ * @author sanenchen
+ */
 class GroupManagerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +39,10 @@ class GroupManagerActivity : ComponentActivity() {
                         content = { Icon(imageVector = Icons.Filled.Add, contentDescription = "添加分组") }
                     )
                 }) {
-                    Column(modifier = Modifier.padding(it).background(OrbitTheme.colors.surface.main).fillMaxSize()) {
+                    Column(modifier = Modifier
+                        .padding(it)
+                        .background(OrbitTheme.colors.surface.main)
+                        .fillMaxSize()) {
                         if (addGroup.value)
                             AddGroup(addGroup)
                         MainUI()
@@ -93,10 +96,17 @@ class GroupManagerActivity : ComponentActivity() {
                     modifier = Modifier.size(24.dp)
                 )
             }
-            IconButton( // 删除
-                onClick = {
+            // 删除
+            val showingConfirmDialog = remember { mutableStateOf(false) }
+            if (showingConfirmDialog.value)
+                DeleteConfirm(showing = showingConfirmDialog) {
                     changeGroupID(groupID = groupID)
                     AppDatabase.database.PasswordGroupDao().dropGroup(id = groupID)
+                    android.widget.Toast.makeText(this@GroupManagerActivity, "删除成功", android.widget.Toast.LENGTH_SHORT).show()
+                }
+            IconButton(
+                onClick = {
+                    showingConfirmDialog.value = true
                 }, modifier = Modifier
                     .padding(end = 16.dp)
                     .size(48.dp)
@@ -141,7 +151,7 @@ class GroupManagerActivity : ComponentActivity() {
                         }
                     }, content = { Text("好了") })
                 },
-                dismissButton = { TextButton(onClick = {addGroup.value = false}, content = { Text("取消") }) }
+                dismissButton = { TextButton(onClick = { addGroup.value = false }, content = { Text("取消") }) }
             )
     }
 
@@ -175,7 +185,7 @@ class GroupManagerActivity : ComponentActivity() {
                         }
                     }, content = { Text("好了") })
                 },
-                dismissButton = { TextButton(onClick = {changeGroup.value = false}, content = { Text("取消") }) }
+                dismissButton = { TextButton(onClick = { changeGroup.value = false }, content = { Text("取消") }) }
             )
     }
 
@@ -188,5 +198,26 @@ class GroupManagerActivity : ComponentActivity() {
             item.groupID = -1
         }
         AppDatabase.database.PasswordDataDao().updateList(dataList)
+    }
+
+    /**
+     * 删除确认 Dialog
+     */
+    @Composable
+    fun DeleteConfirm(showing: MutableState<Boolean>, content: () -> Unit) {
+        AlertDialog(title = { Text("警告", style = OrbitTheme.typography.title2) },
+            text = { Text("此操作将不可恢复", style = OrbitTheme.typography.bodyNormal) },
+            confirmButton = {
+                TextButton(onClick = {
+                    content()
+                }, content = { Text("确认删除") })
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showing.value = false
+                }, content = { Text("取消") })
+            },
+            onDismissRequest = { showing.value = false }
+        )
     }
 }

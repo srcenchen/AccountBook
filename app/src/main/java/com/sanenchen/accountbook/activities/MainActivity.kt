@@ -44,8 +44,16 @@ class MainActivity : ComponentActivity() {
             AccountBookTheme {
                 Scaffold(topBar = {
                     TopAppBar(
-                        title = { Text("简·密码本") }, elevation = 0.dp, actions = {
-                            IconButton(onClick = { startActivity(Intent(this@MainActivity, AddPasswordActivity::class.java)) }) { // 添加按钮
+                        title = { Text("Password") }, elevation = 0.dp, actions = {
+                            IconButton(onClick = {
+                                val intent = Intent(this@MainActivity, PasswordEditActivity::class.java)
+                                intent.putExtra("title", "")
+                                intent.putExtra("user", "")
+                                intent.putExtra("password", "")
+                                intent.putExtra("remark", "")
+                                intent.putExtra("groupName", "")
+                                startActivity(intent)
+                            }) { // 添加按钮
                                 Icon(imageVector = Icons.Filled.Add, contentDescription = "新建")
                             }
                             IconButton(onClick = { startActivity(Intent(this@MainActivity, SettingsActivity::class.java)) }) { // 设置按钮
